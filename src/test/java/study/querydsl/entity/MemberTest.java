@@ -15,7 +15,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-@Commit
+@Rollback(value = true)
+//@Commit
 class MemberTest {
     @Autowired
     EntityManager em;
