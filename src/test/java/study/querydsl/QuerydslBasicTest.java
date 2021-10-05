@@ -13,6 +13,7 @@ import study.querydsl.entity.Team;
 import javax.persistence.EntityManager;
 
 import static org.assertj.core.api.Assertions.*;
+import static study.querydsl.entity.QMember.member;
 
 @SpringBootTest
 @Transactional
@@ -20,9 +21,11 @@ public class QuerydslBasicTest {
 
     @Autowired
     EntityManager em;
+    JPAQueryFactory queryFactory;
 
     @BeforeEach
     public void before() {
+        queryFactory = new JPAQueryFactory(em);
         Team teamA = new Team("teamA");
         Team teamB = new Team("teamB");
         em.persist(teamA);
@@ -53,14 +56,24 @@ public class QuerydslBasicTest {
 
     @Test
     public void startQuerydsl(){
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
-        QMember m = new QMember("m");
+        //JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        //QMember m = new QMember("m");
+        QMember m = member; //위와동일
 
+//        Member findMember = queryFactory
+//                .select(m)
+//                .from(m)
+//                .where(m.username.eq("member1"))
+//                .fetchOne();
+
+        //QMember.member를 static으로 변경함
         Member findMember = queryFactory
-                .select(m)
-                .from(m)
-                .where(m.username.eq("member1"))
+                .select(member)
+                .from(member)
+                .where(member.username.eq("member1"))
                 .fetchOne();
+
+
 
         assertThat(findMember.getUsername()).isEqualTo("member1");
     }
