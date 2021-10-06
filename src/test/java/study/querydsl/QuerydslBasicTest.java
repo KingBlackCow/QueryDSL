@@ -14,6 +14,8 @@ import study.querydsl.entity.QTeam;
 import study.querydsl.entity.Team;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
 
 import java.util.List;
 
@@ -260,9 +262,9 @@ public class QuerydslBasicTest {
         List<Tuple> result = queryFactory
                 .select(member, team)
                 .from(member)
-                .join(member.team, team)
-                //.on(team.name.eq("teamA"))
-                .where(team.name.eq("teamA"))
+                .leftJoin(member.team, team)
+                .on(team.name.eq("teamA"))
+                //.where(team.name.eq("teamA"))
                 .fetch();
 
         for(Tuple tuple: result){
@@ -282,7 +284,7 @@ public class QuerydslBasicTest {
         List<Tuple> result = queryFactory
                 .select(member, team)
                 .from(member)
-                .leftJoin(member.team, team).on(member.username.eq(team.name))
+                .leftJoin(team).on(member.username.eq(team.name))
                 //보통은 leftJoin(member.team, team)
                 // 하지만 연관관계가 없기에 leftJoin(team)
                 .fetch();
@@ -292,6 +294,36 @@ public class QuerydslBasicTest {
         }
     }
 
+    @PersistenceUnit
+    EntityManagerFactory emf;
+
+    @Test
+    public void fetchJoinNo(){
+       em.flush();
+       em.clear();
+
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(member.username.eq("member1"))
+                .fetchOne();
+
+        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
+        assertThat(loaded).as("페치 조인 미적용").isFalse();
+    }
 
 
+    @Test
+    public void fetchJoinUse(){
+        em.flush();
+        em.clear();
+
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .join(member.team,team).fetchJoin()
+                .where(member.username.eq("member1"))
+                .fetchOne();
+
+        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
+        assertThat(loaded).as("페치 조인 미적용").isTrue();
+    }
 }
