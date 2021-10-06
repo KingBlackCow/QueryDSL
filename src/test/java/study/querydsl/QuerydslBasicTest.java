@@ -52,7 +52,7 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    public void startJPQL(){
+    public void startJPQL() {
         Member findMember = em.createQuery("select m from Member m where m.username = :username", Member.class)
                 .setParameter("username", "member1")
                 .getSingleResult();
@@ -61,7 +61,7 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    public void startQuerydsl(){
+    public void startQuerydsl() {
         //JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         //QMember m = new QMember("m");
         QMember m = member; //위와동일
@@ -80,34 +80,33 @@ public class QuerydslBasicTest {
                 .fetchOne();
 
 
-
         assertThat(findMember.getUsername()).isEqualTo("member1");
     }
 
     @Test
-    public void search(){
+    public void search() {
         Member findMember = queryFactory
                 .selectFrom(member)
                 .where(member.username.eq("member1")
-                        .and(member.age.between(10,30)))
+                        .and(member.age.between(10, 30)))
                 .fetchOne();
         assertThat(findMember.getUsername()).isEqualTo("member1");
     }
 
     @Test
-    public void searchAndParam(){
+    public void searchAndParam() {
         Member findMember = queryFactory
                 .selectFrom(member)
                 .where(
                         member.username.eq("member1"),
-                        member.age.between(10,30)
+                        member.age.between(10, 30)
                 )
                 .fetchOne();
         assertThat(findMember.getUsername()).isEqualTo("member1");
     }
 
     @Test
-    public void resultFetch(){
+    public void resultFetch() {
         List<Member> fetch = queryFactory.selectFrom(member)
                 .fetch();
 
@@ -131,7 +130,7 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    public void sort(){
+    public void sort() {
         em.persist(new Member(null, 100));
         em.persist(new Member("member5", 100));
         em.persist(new Member("member6", 100));
@@ -151,7 +150,7 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    public void paging1(){
+    public void paging1() {
         List<Member> result = queryFactory
                 .selectFrom(member)
                 .orderBy(member.username.desc())
@@ -164,7 +163,7 @@ public class QuerydslBasicTest {
 
     //전체조회
     @Test
-    public void paging2(){
+    public void paging2() {
         QueryResults<Member> queryResult = queryFactory
                 .selectFrom(member)
                 .orderBy(member.username.desc())
@@ -179,7 +178,7 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    public void aggregation(){
+    public void aggregation() {
         List<Tuple> result = queryFactory
                 .select(
                         member.count(),
@@ -200,7 +199,7 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    public void group() throws Exception{
+    public void group() throws Exception {
         List<Tuple> result = queryFactory
                 .select(team.name, member.age.avg())
                 .from(member)
@@ -208,8 +207,8 @@ public class QuerydslBasicTest {
                 .groupBy(team.name)
                 .fetch();
 
-        Tuple teamA =result.get(0);
-        Tuple teamB =result.get(1);
+        Tuple teamA = result.get(0);
+        Tuple teamB = result.get(1);
 
         assertThat(teamA.get(team.name)).isEqualTo("teamA");
         assertThat(teamA.get(member.age.avg())).isEqualTo(15);
@@ -218,5 +217,35 @@ public class QuerydslBasicTest {
 
     }
 
+    @Test
+    public void join() {
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .join(member.team, team)
+                .where(team.name.eq("teamA"))
+                .fetch();
+
+        assertThat(result)
+                .extracting("username")
+                .containsExactly("member1","member2");
+    }
+
+    //세타조인 회원의 일므이 팀이름과 같은 회원 조회
+    @Test
+    public void theta_join(){
+        em.persist(new Member("teamA"));
+        em.persist(new Member("teamB"));
+        em.persist(new Member("teamC"));
+
+        List<Member> result = queryFactory
+                .select(member)
+                .from(member, team)
+                .where(member.username.eq(team.name))
+                .fetch();
+
+        assertThat(result)
+                .extracting("username")
+                .containsExactly("teamA","teamB");
+    }
 
 }
