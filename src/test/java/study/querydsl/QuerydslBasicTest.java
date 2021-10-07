@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.dto.MemberDto;
 import study.querydsl.dto.QMemberDto;
@@ -25,6 +26,7 @@ import study.querydsl.entity.QMember;
 import study.querydsl.entity.QTeam;
 import study.querydsl.entity.Team;
 
+import javax.persistence.Column;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
@@ -639,6 +641,40 @@ public class QuerydslBasicTest {
 
     private Predicate allEq(String usernameCond, Integer ageCond){
         return usernameEq(usernameCond).and(ageEq(ageCond));
+    }
+
+    @Test
+    public void bulkUpdate(){
+
+        //count = 바뀐 row수
+        //bulk up쿼리 단점 : 디비에는 반영되나 영속성 컨텍스트에는 반영이안됨
+        long count =queryFactory
+                .update(member)
+                .set(member.username,"비회원")
+                .where(member.age.lt(28))
+                .execute();
+
+        assertThat(count).isEqualTo(2);
+
+        //벌크업 연산이후 em을 초기화 시켜 다시 디비에서 가져올라고고
+        em.flush();
+        em.clear();
+    }
+
+    @Test
+    public void bulkAdd(){
+        long count =queryFactory
+                .update(member)
+                .set(member.age, member.age.add(1))
+                .execute();
+    }
+
+    @Test
+    public void bulkDelete(){
+        long count =queryFactory
+                .delete(member)
+                .where(member.age.gt(18))
+                .execute();
     }
 
 
