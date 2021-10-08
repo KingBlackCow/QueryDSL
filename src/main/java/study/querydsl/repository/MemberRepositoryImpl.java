@@ -7,6 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.data.support.PageableExecutionUtils;
 import study.querydsl.dto.MemberSearchCondition;
 import study.querydsl.dto.MemberTeamDto;
@@ -20,7 +21,9 @@ import static org.springframework.util.StringUtils.hasText;
 import static study.querydsl.entity.QMember.member;
 import static study.querydsl.entity.QTeam.team;
 
-public class MemberRepositoryImpl implements MemberRepositoryCustom {
+public class MemberRepositoryImpl  implements MemberRepositoryCustom {
+
+
     //class이름명이 중요함 Impl을 꼭 클래스 뒤에 붙여주도록
 
     private final JPAQueryFactory queryFactory;
@@ -28,6 +31,13 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     public MemberRepositoryImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
     }
+
+    //extends QuerydslRepositorySupport -> MemberRepositoryImpl옆에 붙이기기
+    //uerydslRepositorySupport
+//    public MemberRepositoryImpl() {
+//        super(Member.class);
+//    }
+
 
     @Override
     public List<MemberTeamDto> search(MemberSearchCondition condition) {
@@ -46,6 +56,27 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                         ageLoe(condition.getAgeLoe()))
                 .fetch();
     }
+
+//    @Override
+//    public List<MemberTeamDto> searchQuerydslRepositorySupport(MemberSearchCondition condition) {
+//
+//        EntityManager em = getEntityManager();
+//
+//        List<MemberTeamDto> result = from(member)
+//                .leftJoin(member.team, team)
+//                .where(usernameEq(condition.getUsername()),
+//                        teamNameEq(condition.getTeamName()),
+//                        ageGoe(condition.getAgeGoe()),
+//                        ageLoe(condition.getAgeLoe()))
+//                .select(new QMemberTeamDto(
+//                        member.id.as("memberId"),
+//                        member.username,
+//                        member.age,
+//                        team.id.as("teamId"),
+//                        team.name.as("teamName")))
+//                .fetch();
+//        return result;
+//    }
 
     private BooleanExpression usernameEq(String username) {
         return hasText(username) ? member.username.eq(username) : null;
