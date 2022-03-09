@@ -81,7 +81,7 @@ public class QuerydslBasicTest {
     public void startQuerydsl() {
         //JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         //QMember m = new QMember("m");
-        QMember m = member; //위와동일
+        //QMember m = member; //위와동일
 
 //        Member findMember = queryFactory
 //                .select(m)
@@ -136,9 +136,8 @@ public class QuerydslBasicTest {
         QueryResults<Member> results = queryFactory
                 .selectFrom(member)
                 .fetchResults();
-
-//        results.getTotal();
-//        List<Member> content = results.getResults();
+        System.out.println("getTotal= "+results.getTotal());
+        List<Member> content = results.getResults();
 
         long total = queryFactory
                 .selectFrom(member)
@@ -149,7 +148,7 @@ public class QuerydslBasicTest {
     @Test
     public void sort() {
         em.persist(new Member(null, 100));
-        em.persist(new Member("member5", 100));
+        em.persist(new Member("memb er5", 100));
         em.persist(new Member("member6", 100));
 
         List<Member> result = queryFactory
@@ -175,7 +174,9 @@ public class QuerydslBasicTest {
                 .limit(2)
                 .fetch();
         assertThat(result.size()).isEqualTo(2);
-
+        for (Member member : result) {
+            System.out.println("member = " + member.getUsername());
+        }
     }
 
     //전체조회
@@ -339,7 +340,7 @@ public class QuerydslBasicTest {
                 .fetchOne();
 
         boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
-        assertThat(loaded).as("페치 조인 미적용").isTrue();
+        assertThat(loaded).as("페치 조인 적용").isTrue();
     }
 
     /*
@@ -640,7 +641,7 @@ public class QuerydslBasicTest {
     }
 
     private Predicate allEq(String usernameCond, Integer ageCond){
-        return usernameEq(usernameCond).and(ageEq(ageCond));
+        return usernameEq(usernameCond).and(ageEq(ageCond ));
     }
 
     @Test
