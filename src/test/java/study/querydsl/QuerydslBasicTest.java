@@ -503,9 +503,7 @@ public class QuerydslBasicTest {
     @Test
     public void findDtoBySetter() {
         List<MemberDto> result = queryFactory
-                .select(Projections.bean(MemberDto.class,
-                        member.username,
-                        member.age))
+                .select(Projections.bean(MemberDto.class, member.username, member.age))
                 .from(member)
                 .fetch();
         for (MemberDto memberDto : result) {
@@ -517,9 +515,7 @@ public class QuerydslBasicTest {
     @Test
     public void findDtoByField() {
         List<MemberDto> result = queryFactory
-                .select(Projections.fields(MemberDto.class,
-                        member.username,
-                        member.age))
+                .select(Projections.fields(MemberDto.class, member.username, member.age))
                 .from(member)
                 .fetch();
         for (MemberDto memberDto : result) {
