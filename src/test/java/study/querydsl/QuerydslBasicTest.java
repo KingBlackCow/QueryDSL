@@ -637,7 +637,7 @@ public class QuerydslBasicTest {
     }
 
     private Predicate allEq(String usernameCond, Integer ageCond){
-        return usernameEq(usernameCond).and(ageEq(ageCond ));
+        return usernameEq(usernameCond).and(ageEq(ageCond));
     }
 
     @Test

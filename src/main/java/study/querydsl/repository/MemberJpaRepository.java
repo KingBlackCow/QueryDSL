@@ -67,21 +67,21 @@ public class MemberJpaRepository {
                 .fetch();
     }
 
-    public List<MemberTeamDto> searchByBuilder(MemberSearchCondition condition){
+    public List<MemberTeamDto> searchByBuilder(MemberSearchCondition condition) {
         BooleanBuilder builder = new BooleanBuilder();
         if (hasText(condition.getUsername())) {
             builder.and(member.username.eq(condition.getUsername()));
         }
 
-        if(hasText(condition.getTeamName())){
+        if (hasText(condition.getTeamName())) {
             builder.and(team.name.eq(condition.getTeamName()));
         }
 
-        if(condition.getAgeGoe() != null){
+        if (condition.getAgeGoe() != null) {
             builder.and(member.age.goe(condition.getAgeGoe()));
         }
 
-        if(condition.getAgeLoe() != null){
+        if (condition.getAgeLoe() != null) {
             builder.and(member.age.loe(condition.getAgeLoe()));
         }
 
@@ -93,12 +93,12 @@ public class MemberJpaRepository {
                         team.id.as("teamId"),
                         team.name.as("teamName")))
                 .from(member)
-                .leftJoin(member.team,team)
+                .leftJoin(member.team, team)
                 .where(builder)
                 .fetch();
     }
 
-    public List<MemberTeamDto> search(MemberSearchCondition condition){
+    public List<MemberTeamDto> search(MemberSearchCondition condition) {
         return queryFactory
                 .select(new QMemberTeamDto(
                         member.id.as("memberId"),
@@ -107,7 +107,7 @@ public class MemberJpaRepository {
                         team.id.as("teamId"),
                         team.name.as("teamName")))
                 .from(member)
-                .leftJoin(member.team,team)
+                .leftJoin(member.team, team)
                 .where(usernameEq(condition.getUsername()),
                         teamNameEq(condition.getTeamName()),
                         ageGoe(condition.getAgeGoe()),
@@ -116,34 +116,34 @@ public class MemberJpaRepository {
     }
 
     private BooleanExpression usernameEq(String username) {
-        return hasText(username) ?  member.username.eq(username):null;
+        return hasText(username) ? member.username.eq(username) : null;
 
     }
 
     private BooleanExpression teamNameEq(String teamName) {
-        return hasText(teamName)? team.name.eq(teamName):null;
+        return hasText(teamName) ? team.name.eq(teamName) : null;
 
     }
 
     private BooleanExpression ageLoe(Integer ageLoe) {
-        return ageLoe !=null?member.age.loe(ageLoe) : null;
+        return ageLoe != null ? member.age.loe(ageLoe) : null;
     }
 
     private BooleanExpression ageGoe(Integer ageGoe) {
-        return ageGoe !=null?member.age.goe(ageGoe) : null;
+        return ageGoe != null ? member.age.goe(ageGoe) : null;
     }
 
-    private BooleanExpression ageBetween(int ageGoe, int ageLoe){
-        return  ageGoe(ageGoe).and(ageLoe(ageLoe));
+    private BooleanExpression ageBetween(int ageGoe, int ageLoe) {
+        return ageGoe(ageGoe).and(ageLoe(ageLoe));
     }
 
-    public List<Member> searchMember(MemberSearchCondition condition){
+    public List<Member> searchMember(MemberSearchCondition condition) {
         return queryFactory
                 .selectFrom(member)
-                .leftJoin(member.team,team)
+                .leftJoin(member.team, team)
                 .where(usernameEq(condition.getUsername()),
                         teamNameEq(condition.getTeamName()),
-                        ageBetween(condition.getAgeGoe(),condition.getAgeLoe()))
+                        ageBetween(condition.getAgeGoe(), condition.getAgeLoe()))
                 .fetch();
     }
 }
