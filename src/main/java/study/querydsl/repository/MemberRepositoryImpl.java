@@ -169,7 +169,7 @@ public class MemberRepositoryImpl  implements MemberRepositoryCustom {
 
         //return new PageImpl<>(content, pageable, total);
         //return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetchCount());
-        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);//PageableExecutionUtils의 역할 가져오는페이지가 전체 개수 마다 많을 경우 total쿼리가 따로 안나감
     }
 
 }
